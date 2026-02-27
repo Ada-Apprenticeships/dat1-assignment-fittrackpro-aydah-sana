@@ -32,8 +32,8 @@ CREATE TABLE members (
     last_name TEXT NOT NULL,
     email TEXT,
     phone_number TEXT,
-    date_of_birth DATE CHECK (date_of_birth GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
-    join_date DATE CHECK (join_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    date_of_birth DATE CHECK (DATE(date_of_birth) IS NOT NULL),
+    join_date DATE CHECK (DATE(join_date) IS NOT NULL),
     emergency_contact_name TEXT,
     emergency_contact_phone TEXT
 );
@@ -45,7 +45,7 @@ CREATE TABLE staff (
     email TEXT,
     phone_number TEXT,
     position TEXT NOT NULL CHECK (position IN ('Trainer', 'Manager', 'Receptionist', 'Maintenance')),
-    hire_date DATE CHECK (hire_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    hire_date DATE CHECK (DATE(hire_date) IS NOT NULL),
     location_id INTEGER NOT NULL,
 
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
@@ -55,9 +55,9 @@ CREATE TABLE equipment (
     equipment_id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     type TEXT NOT NULL CHECK (type IN ('Cardio', 'Strength')),
-    purchase_date DATE CHECK (purchase_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
-    last_maintenance_date DATE CHECK (last_maintenance_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
-    next_maintenance_date DATE CHECK (next_maintenance_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    purchase_date DATE CHECK (DATE(purchase_date) IS NOT NULL),
+    last_maintenance_date DATE CHECK (DATE(last_maintenance_date) IS NOT NULL),
+    next_maintenance_date DATE CHECK (DATE(next_maintenance_date) IS NOT NULL),
     location_id INTEGER NOT NULL,
 
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
@@ -76,8 +76,8 @@ CREATE TABLE classes (
 
 CREATE TABLE class_schedule (
     schedule_id INTEGER PRIMARY KEY,
-    start_time DATE TIME CHECK (start_time GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
-    end_time DATE TIME CHECK (end_time GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
+    start_time DATETIME CHECK (DATETIME(start_time) IS NOT NULL),
+    end_time DATETIME CHECK (DATETIME(end_time) IS NOT NULL),
     class_id INTEGER NOT NULL,
     staff_id INTEGER NOT NULL,
 
@@ -88,8 +88,8 @@ CREATE TABLE class_schedule (
 CREATE TABLE memberships (
     membership_id INTEGER PRIMARY KEY,
     type TEXT  NOT NULL,
-    start_date DATE CHECK (start_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
-    end_date DATE CHECK (end_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]'),
+    start_date DATE CHECK (DATE(start_date) IS NOT NULL),
+    end_date DATE CHECK (DATE(end_date) IS NOT NULL),
     status TEXT NOT NULL CHECK (status IN ('Active', 'Inactive')),
     member_id INTEGER NOT NULL,
 
@@ -98,8 +98,8 @@ CREATE TABLE memberships (
 
 CREATE TABLE attendance (
     attendance_id INTEGER PRIMARY KEY,
-    check_in_time DATE TIME CHECK (check_in_time GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
-    check_out_time DATE TIME CHECK (check_out_time GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
+    check_in_time DATETIME CHECK (DATETIME(check_in_time)),
+    check_out_time DATETIME CHECK (DATETIME(check_out_time)),
     member_id INTEGER NOT NULL,
     location_id INTEGER NOT NULL,
 
@@ -120,7 +120,7 @@ CREATE TABLE class_attendance (
 CREATE TABLE payments (
     payment_id INTEGER PRIMARY KEY,
     amount REAL NOT NULL CHECK (amount > 0),
-    payment_date DATE TIME CHECK (payment_date GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
+    payment_date DATETIME CHECK (DATETIME(payment_date) IS NOT NULL),
     payment_method TEXT NOT NULL CHECK (payment_method IN ('Credit Card', 'Bank Transfer', 'PayPal', 'Cash')),
     payment_type TEXT NOT NULL CHECK (payment_type IN ('Monthly membership fee', 'Day pass')),
     member_id INTEGER NOT NULL,
@@ -130,9 +130,9 @@ CREATE TABLE payments (
 
 CREATE TABLE personal_training_sessions (
     session_id INTEGER PRIMARY KEY,
-    session_date DATE CHECK (session_date GLOB '[0-9][0-9][0-9][0-9]-[0-2][0-9]-[0-9][0-9]'),
-    start_time TIME CHECK (start_time GLOB '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
-    end_time TIME CHECK (end_time GLOB '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]'),
+    session_date DATE CHECK (DATE(session_date) IS NOT NULL),
+    start_time TIME CHECK (TIME(start_time) IS NOT NULL),
+    end_time TIME CHECK (TIME(end_time) IS NOT NULL),
     notes VARCHAR,
     member_id INTEGER NOT NULL,
     staff_id INTEGER NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE personal_training_sessions (
 
 CREATE TABLE member_health_metrics (
     metric_id INTEGER PRIMARY KEY,
-    measurement_date DATE CHECK (measurement_date GLOB '[0-9][0-9][0-9][0-9]-[0-2][0-9]-[0-9][0-9]'),
+    measurement_date DATE CHECK (DATE(measurement_date) IS NOT NULL),
     weight REAL NOT NULL CHECK (weight > 0),
     body_fat_percentage REAL NOT NULL CHECK (body_fat_percentage BETWEEN 0 AND 100),
     muscle_mass REAL NOT NULL CHECK (muscle_mass > 0),
@@ -155,7 +155,7 @@ CREATE TABLE member_health_metrics (
 
 CREATE TABLE equipment_maintenance_log (
     log_id INTEGER PRIMARY KEY,
-    maintenance_date DATE CHECK (maintenance_date GLOB '[0-9][0-9][0-9][0-9]-[0-2][0-9]-[0-9][0-9]'),
+    maintenance_date DATE CHECK (DATE(maintenance_date) IS NOT NULL),
     description VARCHAR,
     equipment_id INTEGER NOT NULL,
     staff_id INTEGER NOT NULL,
